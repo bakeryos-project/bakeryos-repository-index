@@ -9,7 +9,7 @@ update_db:
     - touch dummy_file.txt
     - echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --sign --detach-sign --armor dummy_file.txt
 
-    - repo-add --sign --key "$GPG_KEY_ID" --compress gz bakery-os.db.tar.gz *.pkg.tar.zst
+    - repo-add --sign --key "$GPG_KEY_ID"  bakery-os.db.tar.gz *.pkg.tar.zst
 
     - git config --global user.email "bot@bakeryos.smtdfc"
     - git config --global user.name "Bakery OS Bot"
