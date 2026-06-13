@@ -10,9 +10,10 @@ update_db:
     - echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --sign --detach-sign --armor dummy_file.txt
 
     - repo-add --sign --key "$GPG_KEY_ID"  bakery-os.db.tar.gz */*.pkg.tar.zst
+    - rm -f bakery-os.db
     - mv bakery-os.db.tar.gz bakery-os.db
-    - echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --detach-sign --armor bakery-os.db  
-
+    
+    - gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --detach-sign --armor bakery-os.db
     - git config --global user.email "bot@bakeryos.smtdfc"
     - git config --global user.name "Bakery OS Bot"
     - git add bakery-os.db bakery-os.db.sig
