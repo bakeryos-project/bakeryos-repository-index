@@ -2,7 +2,7 @@ update_db:
   stage: deploy
   image: archlinux:latest
   before_script:
-    - pacman -Sy --noconfirm binutils gnupg
+    - pacman -Sy --noconfirm binutils gnupg git
     - echo "$GPG_PRIVATE_KEY" | base64 -d > private.key
     - gpg --import --batch private.key
   script:
