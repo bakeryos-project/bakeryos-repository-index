@@ -14,6 +14,7 @@ update_db:
     - mv bakery-os.db.tar.gz bakery-os.db
     
     - gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --detach-sign --armor bakery-os.db
+    - ls 
     - git config --global user.email "bot@bakeryos.smtdfc"
     - git config --global user.name "Bakery OS Bot"
     - git add bakery-os.db bakery-os.db.sig
