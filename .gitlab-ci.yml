@@ -17,7 +17,7 @@ update_db:
     - ls 
     - git config --global user.email "bot@bakeryos.smtdfc"
     - git config --global user.name "Bakery OS Bot"
-    - git add bakery-os.db bakery-os.db.sig
+    - git add bakery-os.db bakery-os.db.sig bakery-os.db.asc
     - git add */*.pkg.tar.zst.sig
     - git commit -m "Auto-update Bakery OS database [skip ci]"
     - git push https://oauth2:$AUTH_TOKEN@gitlab.com/bakery-os/bakery-os-repositories.git HEAD:main
