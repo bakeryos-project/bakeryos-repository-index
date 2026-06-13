@@ -9,12 +9,11 @@ update_db:
     - touch dummy_file.txt
     - echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --sign --detach-sign --armor dummy_file.txt
 
-    - find . -name "*.pkg.tar.zst" -print0 | xargs -0 repo-add --sign --key "$GPG_KEY_ID" --passphrase "$GPG_PASSPHRASE" bakeryos.db.tar.zst
-
+    - find . -name "*.pkg.tar.zst" -print0 | xargs -0 repo-add --sign --key "$GPG_KEY_ID" bakery-os.db.tar.zst
 
     - git config --global user.email "bot@bakeryos.smtdfc"
     - git config --global user.name "Bakery OS Bot"
-    - git add bakeryos.db.tar.zst
+    - git add bakery-os.db.tar.zst
     - git add */*.pkg.tar.zst.sig
     - git commit -m "Auto-update Bakery OS database [skip ci]"
     - git push https://oauth2:$AUTH_TOKEN@gitlab.com/bakery-os/bakery-os-repositories.git HEAD:main
