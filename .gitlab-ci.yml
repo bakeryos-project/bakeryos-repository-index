@@ -39,6 +39,4 @@ update:
     - gpg --batch --yes --detach-sign --armor bakery-os.db
       
 
-    - rclone copyto bakery-os.db r2:$R2_BUCKET/x86_64/bakery-os.db
-    - rclone copyto bakery-os.db.sig r2:$R2_BUCKET/x86_64/bakery-os.db.sig
-    - rclone copyto bakery-os.db.asc r2:$R2_BUCKET/x86_64/bakery-os.db.asc
+    - rclone sync . r2:$R2_BUCKET/x86_64 --include "*.db" --include "*.db.sig" --include "*.db.asc"
