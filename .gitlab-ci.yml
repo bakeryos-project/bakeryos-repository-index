@@ -27,13 +27,13 @@ update:
     
   script:
     - rclone copy r2:$R2_BUCKET/x86_64/ .
-    
     - repo-add --sign --key "$GPG_KEY_ID" bakery-os.db.tar.gz *.pkg.tar.zst
     
-
-    - tar -xvf bakery-os.db.tar.gz
+    - cp bakery-os.db.tar.gz bakery-os.db
+    - cp bakery-os.db.tar.gz.sig bakery-os.db.sig
+    
     - echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --detach-sign --armor bakery-os.db
     
-
-    - rclone copy bakery-os.db r2:$R2_BUCKET/x86_64/
-    - rclone copy bakery-os.db.asc r2:$R2_BUCKET/x86_64/
+    - rclone copyto bakery-os.db r2:$R2_BUCKET/x86_64/bakery-os.db
+    - rclone copyto bakery-os.db.sig r2:$R2_BUCKET/x86_64/bakery-os.db.sig
+    - rclone copyto bakery-os.db.asc r2:$R2_BUCKET/x86_64/bakery-os.db.asc
