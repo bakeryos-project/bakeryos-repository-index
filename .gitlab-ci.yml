@@ -29,8 +29,9 @@ update:
     - rclone copy r2:$R2_BUCKET/x86_64/ .
     - repo-add --sign --key "$GPG_KEY_ID" bakery-os.db.tar.gz *.pkg.tar.zst
     
-    - cp bakery-os.db.tar.gz bakery-os.db
-    - cp bakery-os.db.tar.gz.sig bakery-os.db.sig
+    - mv bakery-os.db.tar.gz bakery-os.db
+    - mv bakery-os.db.tar.gz.sig bakery-os.db.sig
+    - mv bakery-os.db.tar.gz.asc bakery-os.db.asc
     
     - echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --detach-sign --armor bakery-os.db
     
