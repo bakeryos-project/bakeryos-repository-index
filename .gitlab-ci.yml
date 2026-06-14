@@ -20,6 +20,7 @@ update:
       access_key_id = $R2_ACCESS_KEY
       secret_access_key = $R2_SECRET_KEY
       endpoint = $R2_ENDPOINT
+      acl = private
       EOF
       
     - echo "$GPG_PRIVATE_KEY" | base64 -d > private.key
@@ -37,11 +38,7 @@ update:
     - gpg --batch --yes --detach-sign bakery-os.db
     - gpg --batch --yes --detach-sign --armor bakery-os.db
       
-    - rclone copyto bakery-os.db r2:$R2_BUCKET/x86_64/bakery-os.db
-    - rclone copyto bakery-os.db.sig r2:$R2_BUCKET/x86_64/bakery-os.db.sig
-    - rclone copyto bakery-os.db.asc r2:$R2_BUCKET/x86_64/bakery-os.db.asc
-    - echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --detach-sign --armor bakery-os.db
-    
+
     - rclone copyto bakery-os.db r2:$R2_BUCKET/x86_64/bakery-os.db
     - rclone copyto bakery-os.db.sig r2:$R2_BUCKET/x86_64/bakery-os.db.sig
     - rclone copyto bakery-os.db.asc r2:$R2_BUCKET/x86_64/bakery-os.db.asc
