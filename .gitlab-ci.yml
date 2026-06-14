@@ -1,4 +1,9 @@
-update_db_worker:
+stages:
+  - build
+  - deploy
+  - update 
+
+update:
   stage: update_db
   image: archlinux:latest
   rules:
