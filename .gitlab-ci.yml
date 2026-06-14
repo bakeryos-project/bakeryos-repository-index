@@ -1,26 +1,34 @@
-update_db:
-  stage: deploy
+update_db_worker:
+  stage: update_db
   image: archlinux:latest
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "pipeline"'
   before_script:
-    - pacman -Sy --noconfirm binutils gnupg git
-    - echo "$GPG_PRIVATE_KEY" | base64 -d > private.key
-    - gpg --import --batch private.key
-  script:
-    - rm -f bakery-os.db
-    - rm -f bakery-os.db.sig
-    - touch dummy_file.txt
-    - echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --sign --detach-sign --armor dummy_file.txt
-
-    - repo-add --sign --key "$GPG_KEY_ID"  bakery-os.db.tar.gz */*.pkg.tar.zst
-    - gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --detach-sign --armor bakery-os.db
+    - pacman -Sy --noconfirm rclone gnupg binutils tar
     
-    - mv bakery-os.db.tar.gz bakery-os.db
-    - mv bakery-os.db.tar.gz.sig bakery-os.db.sig
+    - mkdir -p ~/.config/rclone
+    - |
+      cat <<EOF > ~/.config/rclone/rclone.conf
+      [r2]
+      type = s3
+      provider = Cloudflare
+      access_key_id = $R2_ACCESS_KEY
+      secret_access_key = $R2_SECRET_KEY
+      endpoint = $R2_ENDPOINT
+      EOF
+      
+    - echo "$GPG_PRIVATE_KEY" | base64 -d > private.key
+    - gpg --import --batch --yes private.key
+    
+  script:
+    - rclone copy r2:$R2_BUCKET/x86_64/ .
+    
+    - repo-add --sign --key "$GPG_KEY_ID" bakery-os.db.tar.gz *.pkg.tar.zst
+    
 
-    - ls 
-    - git config --global user.email "bot@bakeryos.smtdfc"
-    - git config --global user.name "Bakery OS Bot"
-    - git add -f bakery-os.db bakery-os.db.sig bakery-os.db.asc
-    - git add */*.pkg.tar.zst.sig
-    - git commit -m "Auto-update Bakery OS database [skip ci]"
-    - git push https://oauth2:$AUTH_TOKEN@gitlab.com/bakery-os/bakery-os-repositories.git HEAD:main
+    - tar -xvf bakery-os.db.tar.gz
+    - echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --detach-sign --armor bakery-os.db
+    
+
+    - rclone copy bakery-os.db r2:$R2_BUCKET/x86_64/
+    - rclone copy bakery-os.db.asc r2:$R2_BUCKET/x86_64/
