@@ -7,7 +7,7 @@ update:
   stage: update
   image: archlinux:latest
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "pipeline"'
+    - when: always
   before_script:
     - pacman -Sy --noconfirm rclone gnupg binutils tar
     
