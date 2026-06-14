@@ -4,7 +4,7 @@ stages:
   - update 
 
 update:
-  stage: update_db
+  stage: update
   image: archlinux:latest
   rules:
     - if: '$CI_PIPELINE_SOURCE == "pipeline"'
