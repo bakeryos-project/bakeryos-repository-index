@@ -30,21 +30,21 @@ update:
     - touch empty_file
     - echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --detach-sign empty_file
     
-    - rclone copy r2:$R2_BUCKET/x86_64/ . --include "bakery-os.db*"
+    - rclone copy r2:$R2_BUCKET/x86_64/ . --include "bakery-os.db*" --include "*.pkg.tar.zst*"
       
-    - |
-      if [ -n "$NEW_PACKAGES" ]; then
-        IFS=',' read -ra ADDR <<< "$NEW_PACKAGES"
-        for pkg in "${ADDR[@]}"; do
-          echo "Downloading package: $pkg"
-          rclone copy r2:$R2_BUCKET/x86_64/$pkg .
+    # - |
+    #   if [ -n "$NEW_PACKAGES" ]; then
+    #     IFS=',' read -ra ADDR <<< "$NEW_PACKAGES"
+    #     for pkg in "${ADDR[@]}"; do
+    #       echo "Downloading new package: $pkg"
+    #       rclone copy r2:$R2_BUCKET/x86_64/$pkg .
           
-          echo "Downloading package signature: $pkg.sig"
-          rclone copy r2:$R2_BUCKET/x86_64/$pkg.sig . || echo "Signature not found! SKIPPED"
-        done
-      else
-        echo "No new packages provide"
-      fi
+    #       echo "Downloading new package signature: $pkg.sig"
+    #       rclone copy r2:$R2_BUCKET/x86_64/$pkg.sig . || echo "Signature not found! SKIPPED"
+    #     done
+    #   else
+    #     echo "No new packages provided. Re-indexing existing repository."
+    #   fi
 
     - repo-add bakery-os.db.tar.gz *.pkg.tar.zst
     - mv bakery-os.db.tar.gz bakery-os.db
@@ -52,4 +52,4 @@ update:
     - echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --detach-sign bakery-os.db
     - echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --detach-sign --armor bakery-os.db
 
-    - rclone copy . r2:$R2_BUCKET/x86_64 --include "bakery-os.db*"
+    - rclone copy . r2:$R2_BUCKET/x86_64
