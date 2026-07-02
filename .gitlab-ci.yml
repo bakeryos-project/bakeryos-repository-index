@@ -52,4 +52,4 @@ update:
     - echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --detach-sign bakery-os.db
     - echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --detach-sign --armor bakery-os.db
 
-    - rclone copy . r2:$R2_BUCKET/x86_64
+    - rclone copy . r2:$R2_BUCKET/x86_64 --include "bakery-os.db*" --include "*.pkg.tar.zst*"
