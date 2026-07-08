@@ -30,7 +30,7 @@ update:
     - touch empty_file
     - echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --detach-sign empty_file
     
-    - rclone copy r2:$R2_BUCKET/x86_64/ . --include "bakery-os.db*" --include "*.pkg.tar.zst*"
+    - rclone copy r2:$R2_BUCKET/x86_64/ . --include "bakeryos.db*" --include "*.pkg.tar.zst*"
       
     # - |
     #   if [ -n "$NEW_PACKAGES" ]; then
@@ -46,10 +46,10 @@ update:
     #     echo "No new packages provided. Re-indexing existing repository."
     #   fi
 
-    - repo-add bakery-os.db.tar.gz *.pkg.tar.zst
-    - mv bakery-os.db.tar.gz bakery-os.db
+    - repo-add bakeryos.db.tar.gz *.pkg.tar.zst
+    - mv bakeryos.db.tar.gz bakeryos.db
       
-    - echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --detach-sign bakery-os.db
-    - echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --detach-sign --armor bakery-os.db
+    - echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --detach-sign bakeryos.db
+    - echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --detach-sign --armor bakeryos.db
 
-    - rclone copy . r2:$R2_BUCKET/x86_64 --include "bakery-os.db*" --include "*.pkg.tar.zst*"
+    - rclone copy . r2:$R2_BUCKET/x86_64 --include "bakeryos.db*" --include "*.pkg.tar.zst*"
