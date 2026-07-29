@@ -1,0 +1,67 @@
+name: Update BakeryOS Repository Index
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [update_repo]
+
+jobs:
+  update-repo:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:latest
+
+    steps:
+      - name: Install dependencies
+        run: |
+          pacman -Sy --noconfirm rclone gnupg binutils tar
+
+      - uses: dopplerhq/secrets-fetch-action@v2.0.0
+        id: doppler
+        with:
+          doppler-token: ${{ secrets.DOPPLER_TOKEN }}
+          inject-env-vars: true
+
+      - name: Configure Rclone
+        run: |
+          mkdir -p ~/.config/rclone
+          cat <<EOF > ~/.config/rclone/rclone.conf
+          [r2]
+          type = s3
+          provider = Cloudflare
+          access_key_id = $R2_ACCESS_KEY
+          secret_access_key = $R2_SECRET_KEY
+          endpoint = $R2_ENDPOINT
+          acl = private
+          EOF
+
+      - name: Import GPG Key
+        run: |
+          echo "$GPG_PRIVATE_KEY" | base64 -d > private.key
+          gpg --import --batch --yes private.key
+          rm -f private.key
+
+      - name: Sync Repo from R2 and Run repo-add
+        run: |
+          rclone copy r2:$R2_BUCKET/x86_64/ . --include "bakeryos.db*" --include "*.pkg.tar.zst" --include "*.pkg.tar.zst.sig"
+
+          if compgen -G "*.pkg.tar.zst" > /dev/null; then
+            if [ -f bakeryos.db.tar.gz ]; then
+              repo-add bakeryos.db.tar.gz *.pkg.tar.zst
+            elif [ -f bakeryos.db ]; then
+              mv bakeryos.db bakeryos.db.tar.gz
+              repo-add bakeryos.db.tar.gz *.pkg.tar.zst
+            else
+              repo-add bakeryos.db.tar.gz *.pkg.tar.zst
+            fi
+
+            mv bakeryos.db.tar.gz bakeryos.db
+
+            echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --detach-sign bakeryos.db
+            echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --detach-sign --armor bakeryos.db
+
+            rclone copy . r2:$R2_BUCKET/x86_64 --include "bakeryos.db*" --include "*.pkg.tar.zst*"
+          else
+            echo "Error: No packages found locally or remotely to process!"
+            exit 1
+          fi
