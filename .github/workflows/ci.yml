@@ -43,7 +43,7 @@ jobs:
 
       - name: Sync Repo from R2 and Run repo-add
         run: |
-          rclone copy r2:$R2_BUCKET/x86_64/ . --include "bakeryos.db*" --include "*.pkg.tar.zst" --include "*.pkg.tar.zst.sig"
+          rclone copy r2:$R2_BUCKET/x86_64/ . --include "bakeryos.db*" --include "*.pkg.tar.zst" --include "*.pkg.tar.zst.sig" --include "bakeryos.files*"
 
           if compgen -G "*.pkg.tar.zst" > /dev/null; then
             if [ -f bakeryos.db.tar.gz ]; then
@@ -60,7 +60,7 @@ jobs:
             echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --detach-sign bakeryos.db
             echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --detach-sign --armor bakeryos.db
 
-            rclone copy . r2:$R2_BUCKET/x86_64 --include "bakeryos.db*" --include "*.pkg.tar.zst*"
+            rclone copy . r2:$R2_BUCKET/x86_64 --include "bakeryos.db*" --include "*.pkg.tar.zst*" --include "bakeryos.files*"
           else
             echo "Error: No packages found locally or remotely to process!"
             exit 1
